@@ -19,42 +19,44 @@ end entity;
 
 architecture arch of sseg is
 
-  signal an       : std_logic_vector(3 downto 0);
-  signal value    : unsigned(15 downto 0);
-  signal digit    : unsigned(3 downto 0);
+  signal an    : std_logic_vector(3 downto 0);
+  signal digit : unsigned(3 downto 0);
 
 
   type state_t is ( DIG1, DIG2, DIG3, DIG4 );
-  signal state : state_t;
+  signal state : state_t := DIG1;
 
 begin
 
-  -- capture the input value and cycle through digits:
+  -- capture and cycle through digits:
   process(clk_in)
   begin
     if rising_edge(clk_in) then
-      if rst_in = '1' then
-        value <= to_unsigned(0, value'length);
-      else
-        value <= value_in;
-        case state is
-          when DIG1 =>   state <= DIG2;
-          when DIG2 =>   state <= DIG3;
-          when DIG3 =>   state <= DIG4;
-          when DIG4 =>   state <= DIG1;
-          when others => state <= DIG1;
-        end case;
-      end if;
+      case state is
+        when DIG1 =>
+          digit <= value_in(15 downto 12);
+          an    <= (0=>'0', others=>'1');
+          state <= DIG2;
+        when DIG2 =>
+          digit <= value_in(11 downto 8);
+          an    <= (1=>'0', others=>'1');
+          state <= DIG3;
+        when DIG3 =>
+          digit <= value_in(7 downto 4);
+          an    <= (2=>'0', others=>'1');
+          state <= DIG4;
+        when DIG4 =>
+          digit <= value_in(3 downto 0);
+          an    <= (3=>'0', others=>'1');
+          state <= DIG1;
+        when others =>
+          an    <= (others=>'1');
+          state <= DIG1;
+      end case;
     end if;
   end process;
 
-  -- select a digit and decode to proper segments:
-  with state select
-    digit <= value(3  downto  0) when DIG4,
-             value(7  downto  4) when DIG3,
-             value(11 downto  8) when DIG2,
-             value(15 downto 12) when others;
-
+  -- decode
   with digit select   --< g: msb, a: lsb
     seg_out <= "0001110" when x"f",
                "0000110" when x"e",
@@ -73,14 +75,6 @@ begin
                "1111001" when x"1",
                "1000000" when others;
 
-
-  -- drive anode for desired digit, if enabled:
-  with state select
-    an <= (3=>'0', others=>'1') when DIG4,
-          (2=>'0', others=>'1') when DIG3,
-          (1=>'0', others=>'1') when DIG2,
-          (0=>'0', others=>'1') when DIG1,
-                  (others=>'1') when others;
   an_out <= an when enb_in = '1' else (others=>'1');
 
 end architecture;

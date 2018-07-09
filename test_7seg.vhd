@@ -19,12 +19,11 @@ end entity;
 architecture arch of top is
 
   component sseg is
-    port( value_in       : in  unsigned(15 downto 0);
-          enb_in         : in  std_logic;
-          clk_in, rst_in : in  std_logic;
-
-          an_out         : out std_logic_vector(3 downto 0);
-          seg_out        : out std_logic_vector(6 downto 0) );
+    port( value_in : in  unsigned(15 downto 0);
+          enb_in   : in  std_logic;
+          clk_in   : in  std_logic;
+          an_out   : out std_logic_vector(3 downto 0);
+          seg_out  : out std_logic_vector(6 downto 0) );
   end component;
 
   signal clk : unsigned(31 downto 0);
@@ -35,7 +34,6 @@ begin
     port map( value_in   => clk(31 downto 16),
               enb_in     => not(btn(2)),
               clk_in     => clk(14),
-              rst_in     => btn(1),
               an_out     => sseg_an,
               seg_out(0) => sseg_a,
               seg_out(1) => sseg_b,

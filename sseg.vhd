@@ -9,12 +9,11 @@ library ieee;
 use ieee.std_logic_1164.all, ieee.numeric_std.all;
 
 entity sseg is
-  port( value_in       : in  unsigned(15 downto 0);
-        enb_in         : in  std_logic;
-        clk_in, rst_in : in  std_logic;
-
-        an_out         : out std_logic_vector(3 downto 0);
-        seg_out        : out std_logic_vector(6 downto 0) );
+  port( value_in : in  unsigned(15 downto 0);
+        enb_in   : in  std_logic;
+        clk_in   : in  std_logic;
+        an_out   : out std_logic_vector(3 downto 0);
+        seg_out  : out std_logic_vector(6 downto 0) );
 end entity;
 
 architecture arch of sseg is
